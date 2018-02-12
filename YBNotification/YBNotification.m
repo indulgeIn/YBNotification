@@ -83,6 +83,10 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     }
 }
 
+- (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification * _Nonnull))block {
+    return nil;
+}
+
 #pragma mark 发送通知
 - (void)postNotification:(YBNotification *)notification {
     if (!notification) {
