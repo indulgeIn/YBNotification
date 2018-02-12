@@ -101,25 +101,43 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
         }];
     }
 }
+- (void)postNotificationName:(NSNotificationName)aName object:(id)anObject {
+    YBNotification *noti = [[YBNotification alloc] initWithName:aName object:anObject userInfo:nil];
+    [self postNotification:noti];
+}
+- (void)postNotificationName:(NSNotificationName)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo {
+    YBNotification *noti = [[YBNotification alloc] initWithName:aName object:anObject userInfo:aUserInfo];
+    [self postNotification:noti];
+}
 
 #pragma mark 移除通知
+- (void)removeObserver:(id)observer {
+    [self removeObserver:observer name:nil object:nil];
+}
 - (void)removeObserver:(id)observer name:(NSString *)aName object:(id)anObject {
     if (!observer) {
         return;
     }
-    if (aName && [aName isKindOfClass:[NSString class]]) {
-        NSMutableDictionary *observersDic = YBNotificationCenter.defaultCenter.observersDic;
-        @synchronized(observersDic) {
+    NSMutableDictionary *observersDic = YBNotificationCenter.defaultCenter.observersDic;
+    @synchronized(observersDic) {
+        if (aName && [aName isKindOfClass:[NSString class]]) {
             NSMutableArray *tempArr = [observersDic objectForKey:[aName mutableCopy]];
-            [tempArr enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                BOOL needRemove = obj.observer == observer && (!anObject || anObject == obj.object);
-                if (needRemove) {
-                    [tempArr removeObject:obj];
-                }
+            [self array_removeObserver:observer name:aName object:anObject array:tempArr];
+        } else {
+            [observersDic enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSMutableArray *obj, BOOL * _Nonnull stop) {
+                [self array_removeObserver:observer name:aName object:anObject array:obj];
             }];
         }
-    } else {
-        
+    }
+}
+- (void)array_removeObserver:(id)observer name:(NSString *)aName object:(id)anObject array:(NSMutableArray *)array {
+    @autoreleasepool {
+        [array.copy enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            BOOL needRemove = obj.observer == observer && (!anObject || anObject == obj.object);
+            if (needRemove) {
+                [array removeObject:obj];
+            }
+        }];
     }
 }
 
