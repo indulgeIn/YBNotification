@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface YBNotification : NSObject
+@interface YBNotification : NSObject <NSCopying, NSCoding>
 
 @property (readonly, copy) NSString *name;
 @property (nullable, readonly, weak) id object;
@@ -27,13 +27,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addObserver:(id)observer selector:(SEL)aSelector name:(nullable NSString *)aName object:(nullable id)anObject;
 
 - (void)postNotification:(YBNotification *)notification;
-- (void)postNotificationName:(NSNotificationName)aName object:(nullable id)anObject;
-- (void)postNotificationName:(NSNotificationName)aName object:(nullable id)anObject userInfo:(nullable NSDictionary *)aUserInfo;
+- (void)postNotificationName:(NSString *)aName object:(nullable id)anObject;
+- (void)postNotificationName:(NSString *)aName object:(nullable id)anObject userInfo:(nullable NSDictionary *)aUserInfo;
 
 - (void)removeObserver:(id)observer;
 - (void)removeObserver:(id)observer name:(nullable NSString *)aName object:(nullable id)anObject;
 
-- (id <NSObject>)addObserverForName:(nullable NSString *)name object:(nullable id)obj queue:(nullable NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *note))block;
+//该实现有个缺陷，外部对返回值必须强持有，否则返回值会释放，就无法释放掉这个通知。
+- (id<NSObject>)addObserverForName:(nullable NSString *)name object:(nullable id)obj queue:(nullable NSOperationQueue *)queue usingBlock:(void (^)(YBNotification *note))block;
 
 @end
 

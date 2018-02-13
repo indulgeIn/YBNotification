@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "TestVC.h"
 
 @interface ViewController ()
 
@@ -24,8 +25,10 @@
     _obj1 = [NSObject new];
     NSLog(@"_obj0:%@ _obj1:%@", _obj0, _obj1);
     
-    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test0" object:nil];
-    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:nil object:nil];
+//    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test0" object:nil];
+//    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:nil object:nil];
+    
+    
 }
 
 - (void)respondsToNotice:(YBNotification *)noti {
@@ -35,13 +38,14 @@
 }
 
 - (IBAction)clickButton0:(id)sender {
-    [YBNotificationCenter.defaultCenter postNotificationName:@"test0" object:_obj0 userInfo:@{@"key":@"value"}];
+    [YBNotificationCenter.defaultCenter postNotificationName:@"test1" object:_obj0 userInfo:@{@"key":@"value"}];
 }
 - (IBAction)clickButton1:(id)sender {
     [YBNotificationCenter.defaultCenter removeObserver:self name:@"test0" object:nil];
 }
 - (IBAction)clickButton2:(id)sender {
-    
+    TestVC *vc = [TestVC new];
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 

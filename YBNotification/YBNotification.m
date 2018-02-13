@@ -7,8 +7,9 @@
 //
 
 #import "YBNotification.h"
+#import <objc/runtime.h>
 
-
+//发送通知消息体类
 @interface YBNotification ()
 
 @property (copy) NSString *name;
@@ -29,26 +30,63 @@
     noti.userInfo = userInfo;
     return noti;
 }
+- (id)copyWithZone:(NSZone *)zone {
+    YBNotification *model = [[[self class] allocWithZone:zone] init];
+    model.name = self.name;
+    model.object = self.object;
+    model.userInfo = self.userInfo;
+    return model;
+}
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:self.name forKey:@"name"];
+    [aCoder encodeObject:self.object forKey:@"object"];
+    [aCoder encodeObject:self.userInfo forKey:@"userInfo"];
+}
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        self.name = [aDecoder decodeObjectForKey:@"name"];
+        self.object = [aDecoder decodeObjectForKey:@"object"];
+        self.userInfo = [aDecoder decodeObjectForKey:@"userInfo"];
+    }
+    return self;
+}
 
 @end
 
 
+//响应者信息存储模型类
+@class YBNotification;
 @interface YBObserverInfoModel : NSObject
-
 @property (weak) id observer;
 @property (assign) SEL selector;
 @property (weak) id object;
 @property (copy) NSString *name;
-
+@property (strong) NSOperationQueue *queue;
+@property (copy) void(^block)(YBNotification *noti);
 @end
-
 @implementation YBObserverInfoModel
-
+- (void)dealloc {
+    NSLog(@"%@ dealloc", self);
+}
 @end
 
 
-static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
+//监听响应者释放类
+@interface YBObserverMonitor : NSObject
+@property (nonatomic, weak) id observer;
+@end
+@implementation YBObserverMonitor
+- (void)dealloc {
+    NSLog(@"%@ dealloc", self);
+    if (self.observer) {
+        [YBNotificationCenter.defaultCenter removeObserver:self.observer];
+    }
+}
+@end
 
+
+//消息中心类
+static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
 @interface YBNotificationCenter ()
 
 @property (class, strong) YBNotificationCenter *defaultCenter;
@@ -69,9 +107,41 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     observerInfo.object = anObject;
     observerInfo.name = aName;
     
+    [self addObserverInfo:observerInfo];
+}
+
+- (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(YBNotification * _Nonnull))block {
+    if (!block) {
+        return nil;
+    }
+    YBObserverInfoModel *observerInfo = [YBObserverInfoModel new];
+    observerInfo.object = obj;
+    observerInfo.name = name;
+    observerInfo.queue = queue;
+    observerInfo.block = block;
+    NSObject *observer = [NSObject new];
+    observerInfo.observer = observer;
+    
+    [self addObserverInfo:observerInfo];
+    return observer;
+}
+
+- (void)addObserverInfo:(YBObserverInfoModel *)observerInfo {
+    
+    //为observer创建一个释放监听器
+    id resultObserver = observerInfo.observer;
+    if (!resultObserver) {
+        return;
+    }
+    YBObserverMonitor *monitor = [YBObserverMonitor new];
+    monitor.observer = resultObserver;
+    const char keyOfmonitor;
+    objc_setAssociatedObject(resultObserver, &keyOfmonitor, monitor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    
+    //添加进observersDic
     NSMutableDictionary *observersDic = YBNotificationCenter.defaultCenter.observersDic;
     @synchronized(observersDic) {
-        NSString *key = (aName && [aName isKindOfClass:NSString.class]) ? aName : key_observersDic_noContent;
+        NSString *key = (observerInfo.name && [observerInfo.name isKindOfClass:NSString.class]) ? observerInfo.name : key_observersDic_noContent;
         if ([observersDic objectForKey:key]) {
             NSMutableArray *tempArr = [observersDic objectForKey:key];
             [tempArr addObject:observerInfo];
@@ -83,10 +153,6 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     }
 }
 
-- (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification * _Nonnull))block {
-    return nil;
-}
-
 #pragma mark 发送通知
 - (void)postNotification:(YBNotification *)notification {
     if (!notification) {
@@ -96,20 +162,32 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     NSMutableArray *tempArr = [observersDic objectForKey:notification.name];
     if (tempArr) {
         [tempArr enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if (!obj.object || obj.object == notification.object) {
+            if (obj.block) {
+                if (obj.queue) {
+                    NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
+                        obj.block(notification);
+                    }];
+                    NSOperationQueue *queue = obj.queue;
+                    [queue addOperation:operation];
+                } else {
+                    obj.block(notification);
+                }
+            } else {
+                if (!obj.object || obj.object == notification.object) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-                [obj.observer performSelector:obj.selector withObject:notification];
+                    obj.observer?[obj.observer performSelector:obj.selector withObject:notification]:nil;
 #pragma clang diagnostic pop
+                }
             }
         }];
     }
 }
-- (void)postNotificationName:(NSNotificationName)aName object:(id)anObject {
+- (void)postNotificationName:(NSString *)aName object:(id)anObject {
     YBNotification *noti = [[YBNotification alloc] initWithName:aName object:anObject userInfo:nil];
     [self postNotification:noti];
 }
-- (void)postNotificationName:(NSNotificationName)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo {
+- (void)postNotificationName:(NSString *)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo {
     YBNotification *noti = [[YBNotification alloc] initWithName:aName object:anObject userInfo:aUserInfo];
     [self postNotification:noti];
 }
@@ -137,8 +215,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
 - (void)array_removeObserver:(id)observer name:(NSString *)aName object:(id)anObject array:(NSMutableArray *)array {
     @autoreleasepool {
         [array.copy enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            BOOL needRemove = obj.observer == observer && (!anObject || anObject == obj.object);
-            if (needRemove) {
+            if (obj.observer == observer && (!anObject || anObject == obj.object)) {
                 [array removeObject:obj];
             }
         }];

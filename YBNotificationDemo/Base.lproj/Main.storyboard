@@ -33,8 +33,8 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AWe-AQ-cak">
-                                <rect key="frame" x="164" y="220" width="46" height="30"/>
-                                <state key="normal" title="Button"/>
+                                <rect key="frame" x="171.5" y="220" width="31" height="30"/>
+                                <state key="normal" title="跳转"/>
                                 <connections>
                                     <action selector="clickButton2:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uqV-sR-FhI"/>
                                 </connections>

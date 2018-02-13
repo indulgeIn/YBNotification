@@ -14,6 +14,8 @@
 		701262112031612E00F1FD05 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7012620F2031612E00F1FD05 /* LaunchScreen.storyboard */; };
 		701262142031612E00F1FD05 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 701262132031612E00F1FD05 /* main.m */; };
 		7012622A2031890D00F1FD05 /* YBNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 701262292031890D00F1FD05 /* YBNotification.m */; };
+		703ABA6A2032870800D27172 /* TestVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 703ABA682032870800D27172 /* TestVC.m */; };
+		703ABA6B2032870800D27172 /* TestVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 703ABA692032870800D27172 /* TestVC.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,9 @@
 		701262282031890D00F1FD05 /* YBNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YBNotification.h; sourceTree = "<group>"; };
 		701262292031890D00F1FD05 /* YBNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YBNotification.m; sourceTree = "<group>"; };
 		7012622B20318B5E00F1FD05 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		703ABA672032870800D27172 /* TestVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestVC.h; sourceTree = "<group>"; };
+		703ABA682032870800D27172 /* TestVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestVC.m; sourceTree = "<group>"; };
+		703ABA692032870800D27172 /* TestVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TestVC.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,8 +67,9 @@
 		701262032031612E00F1FD05 /* YBNotificationDemo */ = {
 			isa = PBXGroup;
 			children = (
-				7012622B20318B5E00F1FD05 /* PrefixHeader.pch */,
+				703ABA5E2032869B00D27172 /* Test */,
 				701262272031890D00F1FD05 /* YBNotification */,
+				7012622B20318B5E00F1FD05 /* PrefixHeader.pch */,
 				701262042031612E00F1FD05 /* AppDelegate.h */,
 				701262052031612E00F1FD05 /* AppDelegate.m */,
 				701262072031612E00F1FD05 /* ViewController.h */,
@@ -85,6 +91,16 @@
 			);
 			path = YBNotification;
 			sourceTree = SOURCE_ROOT;
+		};
+		703ABA5E2032869B00D27172 /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				703ABA672032870800D27172 /* TestVC.h */,
+				703ABA682032870800D27172 /* TestVC.m */,
+				703ABA692032870800D27172 /* TestVC.xib */,
+			);
+			path = Test;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -144,6 +160,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				703ABA6B2032870800D27172 /* TestVC.xib in Resources */,
 				701262112031612E00F1FD05 /* LaunchScreen.storyboard in Resources */,
 				7012620E2031612E00F1FD05 /* Assets.xcassets in Resources */,
 				7012620C2031612E00F1FD05 /* Main.storyboard in Resources */,
@@ -160,6 +177,7 @@
 				701262092031612E00F1FD05 /* ViewController.m in Sources */,
 				7012622A2031890D00F1FD05 /* YBNotification.m in Sources */,
 				701262142031612E00F1FD05 /* main.m in Sources */,
+				703ABA6A2032870800D27172 /* TestVC.m in Sources */,
 				701262062031612E00F1FD05 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
