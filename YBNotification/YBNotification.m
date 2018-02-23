@@ -75,7 +75,6 @@
 
 //监听响应者释放类
 @interface YBObserverMonitor : NSObject
-@property (weak) id observer;
 @property (strong) NSString *observerId;
 @end
 @implementation YBObserverMonitor
@@ -137,7 +136,6 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
         return;
     }
     YBObserverMonitor *monitor = [YBObserverMonitor new];
-    monitor.observer = resultObserver;
     monitor.observerId = observerInfo.observerId;
     const char *keyOfmonitor = [[NSString stringWithFormat:@"%@", monitor] UTF8String];
     objc_setAssociatedObject(resultObserver, keyOfmonitor, monitor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -219,15 +217,15 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     @synchronized(observersDic) {
         if (aName && [aName isKindOfClass:[NSString class]]) {
             NSMutableArray *tempArr = [observersDic objectForKey:[aName mutableCopy]];
-            [self array_removeObserverId:observerId name:aName object:anObject array:tempArr];
+            [self array_removeObserverId:observerId object:anObject array:tempArr];
         } else {
             [observersDic enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSMutableArray *obj, BOOL * _Nonnull stop) {
-                [self array_removeObserverId:observerId name:aName object:anObject array:obj];
+                [self array_removeObserverId:observerId object:anObject array:obj];
             }];
         }
     }
 }
-- (void)array_removeObserverId:(NSString *)observerId name:(NSString *)aName object:(id)anObject array:(NSMutableArray *)array {
+- (void)array_removeObserverId:(NSString *)observerId object:(id)anObject array:(NSMutableArray *)array {
     @autoreleasepool {
         [array.copy enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([obj.observerId isEqualToString:observerId] && (!anObject || anObject == obj.object)) {

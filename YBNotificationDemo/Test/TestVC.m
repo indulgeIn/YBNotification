@@ -10,7 +10,7 @@
 
 @interface TestVC ()
 
-@property (nonatomic, weak) id any;
+@property (nonatomic, strong) id any;
 
 @end
 
