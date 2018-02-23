@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)removeObserver:(id)observer;
 - (void)removeObserver:(id)observer name:(nullable NSString *)aName object:(nullable id)anObject;
+- (void)removeObserverId:(NSString *)observerId;
 
 //该实现有个缺陷，外部对返回值必须强持有，否则返回值会释放，就无法释放掉这个通知。
 - (id<NSObject>)addObserverForName:(nullable NSString *)name object:(nullable id)obj queue:(nullable NSOperationQueue *)queue usingBlock:(void (^)(YBNotification *note))block;

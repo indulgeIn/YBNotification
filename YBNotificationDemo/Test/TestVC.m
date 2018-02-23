@@ -18,17 +18,17 @@
 @implementation TestVC
 - (void)dealloc {
     NSLog(@"%@ dealloc", self);
-    if (_any) {
-        [YBNotificationCenter.defaultCenter removeObserver:_any];
-    }
+//    if (_any) {
+//        [YBNotificationCenter.defaultCenter removeObserver:_any];
+//    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-//    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test1" object:nil];
-    _any = [YBNotificationCenter.defaultCenter addObserverForName:@"test1" object:nil queue:nil usingBlock:^(YBNotification * _Nonnull note) {
-
-    }];
+    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test1" object:nil];
+//    _any = [YBNotificationCenter.defaultCenter addObserverForName:@"test1" object:nil queue:nil usingBlock:^(YBNotification * _Nonnull note) {
+//
+//    }];
     
 }
 

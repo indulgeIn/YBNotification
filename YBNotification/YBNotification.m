@@ -58,6 +58,7 @@
 @class YBNotification;
 @interface YBObserverInfoModel : NSObject
 @property (weak) id observer;
+@property (strong) NSString *observerId;
 @property (assign) SEL selector;
 @property (weak) id object;
 @property (copy) NSString *name;
@@ -73,14 +74,13 @@
 
 //监听响应者释放类
 @interface YBObserverMonitor : NSObject
-@property (nonatomic, weak) id observer;
+@property (weak) id observer;
+@property (strong) NSString *observerId;
 @end
 @implementation YBObserverMonitor
 - (void)dealloc {
     NSLog(@"%@ dealloc", self);
-    if (self.observer) {
-        [YBNotificationCenter.defaultCenter removeObserver:self.observer];
-    }
+    [YBNotificationCenter.defaultCenter removeObserverId:self.observerId];
 }
 @end
 
@@ -103,6 +103,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     }
     YBObserverInfoModel *observerInfo = [YBObserverInfoModel new];
     observerInfo.observer = observer;
+    observerInfo.observerId = [NSString stringWithFormat:@"%@", observer];
     observerInfo.selector = aSelector;
     observerInfo.object = anObject;
     observerInfo.name = aName;
@@ -121,6 +122,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     observerInfo.block = block;
     NSObject *observer = [NSObject new];
     observerInfo.observer = observer;
+    observerInfo.observerId = [NSString stringWithFormat:@"%@", observer];
     
     [self addObserverInfo:observerInfo];
     return observer;
@@ -135,6 +137,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     }
     YBObserverMonitor *monitor = [YBObserverMonitor new];
     monitor.observer = resultObserver;
+    monitor.observerId = [NSString stringWithFormat:@"%@", resultObserver];
     const char keyOfmonitor;
     objc_setAssociatedObject(resultObserver, &keyOfmonitor, monitor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
@@ -200,22 +203,31 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     if (!observer) {
         return;
     }
+    [self removeObserverId:[NSString stringWithFormat:@"%@", observer] name:aName object:anObject];
+}
+- (void)removeObserverId:(NSString *)observerId {
+    [self removeObserverId:observerId name:nil object:nil];
+}
+- (void)removeObserverId:(NSString *)observerId name:(NSString *)aName object:(id)anObject {
+    if (!observerId) {
+        return;
+    }
     NSMutableDictionary *observersDic = YBNotificationCenter.defaultCenter.observersDic;
     @synchronized(observersDic) {
         if (aName && [aName isKindOfClass:[NSString class]]) {
             NSMutableArray *tempArr = [observersDic objectForKey:[aName mutableCopy]];
-            [self array_removeObserver:observer name:aName object:anObject array:tempArr];
+            [self array_removeObserverId:observerId name:aName object:anObject array:tempArr];
         } else {
             [observersDic enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSMutableArray *obj, BOOL * _Nonnull stop) {
-                [self array_removeObserver:observer name:aName object:anObject array:obj];
+                [self array_removeObserverId:observerId name:aName object:anObject array:obj];
             }];
         }
     }
 }
-- (void)array_removeObserver:(id)observer name:(NSString *)aName object:(id)anObject array:(NSMutableArray *)array {
+- (void)array_removeObserverId:(NSString *)observerId name:(NSString *)aName object:(id)anObject array:(NSMutableArray *)array {
     @autoreleasepool {
         [array.copy enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if (obj.observer == observer && (!anObject || anObject == obj.object)) {
+            if ([obj.observerId isEqualToString:observerId] && (!anObject || anObject == obj.object)) {
                 [array removeObject:obj];
             }
         }];
