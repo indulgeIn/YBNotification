@@ -58,6 +58,7 @@
 @class YBNotification;
 @interface YBObserverInfoModel : NSObject
 @property (weak) id observer;
+@property (strong) id observer_strong;
 @property (strong) NSString *observerId;
 @property (assign) SEL selector;
 @property (weak) id object;
@@ -121,7 +122,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     observerInfo.queue = queue;
     observerInfo.block = block;
     NSObject *observer = [NSObject new];
-    observerInfo.observer = observer;
+    observerInfo.observer_strong = observer;
     observerInfo.observerId = [NSString stringWithFormat:@"%@", observer];
     
     [self addObserverInfo:observerInfo];
@@ -131,7 +132,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
 - (void)addObserverInfo:(YBObserverInfoModel *)observerInfo {
     
     //为observer关联一个释放监听器
-    id resultObserver = observerInfo.observer;
+    id resultObserver = observerInfo.observer?observerInfo.observer:observerInfo.observer_strong;
     if (!resultObserver) {
         return;
     }
