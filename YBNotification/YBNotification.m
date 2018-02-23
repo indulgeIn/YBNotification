@@ -130,16 +130,16 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
 
 - (void)addObserverInfo:(YBObserverInfoModel *)observerInfo {
     
-    //为observer创建一个释放监听器
+    //为observer关联一个释放监听器
     id resultObserver = observerInfo.observer;
     if (!resultObserver) {
         return;
     }
     YBObserverMonitor *monitor = [YBObserverMonitor new];
     monitor.observer = resultObserver;
-    monitor.observerId = [NSString stringWithFormat:@"%@", resultObserver];
-    const char keyOfmonitor;
-    objc_setAssociatedObject(resultObserver, &keyOfmonitor, monitor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    monitor.observerId = observerInfo.observerId;
+    const char *keyOfmonitor = [[NSString stringWithFormat:@"%@", monitor] UTF8String];
+    objc_setAssociatedObject(resultObserver, keyOfmonitor, monitor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
     //添加进observersDic
     NSMutableDictionary *observersDic = YBNotificationCenter.defaultCenter.observersDic;
@@ -196,6 +196,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
 }
 
 #pragma mark 移除通知
+//通过observer移除
 - (void)removeObserver:(id)observer {
     [self removeObserver:observer name:nil object:nil];
 }
@@ -205,6 +206,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     }
     [self removeObserverId:[NSString stringWithFormat:@"%@", observer] name:aName object:anObject];
 }
+//通过observerId移除
 - (void)removeObserverId:(NSString *)observerId {
     [self removeObserverId:observerId name:nil object:nil];
 }
@@ -237,7 +239,9 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
 #pragma mark 单例相关方法
 static YBNotificationCenter *_defaultCenter = nil;
 + (void)setDefaultCenter:(YBNotificationCenter *)x {
-    _defaultCenter = x;
+    if (!self.defaultCenter) {
+        _defaultCenter = x;
+    }
 }
 + (YBNotificationCenter *)defaultCenter {
     static dispatch_once_t onceToken;

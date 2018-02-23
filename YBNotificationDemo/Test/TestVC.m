@@ -26,6 +26,7 @@
     [super viewDidLoad];
 
     [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test1" object:nil];
+    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test2" object:nil];
 //    _any = [YBNotificationCenter.defaultCenter addObserverForName:@"test1" object:nil queue:nil usingBlock:^(YBNotification * _Nonnull note) {
 //
 //    }];
@@ -41,6 +42,7 @@
 - (IBAction)clickSend:(id)sender {
     
     [YBNotificationCenter.defaultCenter postNotificationName:@"test1" object:nil userInfo:@{@"key":@"value"}];
+    [YBNotificationCenter.defaultCenter postNotificationName:@"test2" object:nil userInfo:@{@"key":@"value"}];
 }
 
 - (IBAction)clickBack:(id)sender {
