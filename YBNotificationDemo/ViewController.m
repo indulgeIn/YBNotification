@@ -27,8 +27,7 @@
     
 //    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test0" object:nil];
 //    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:nil object:nil];
-    
-    
+
 }
 
 - (void)respondsToNotice:(YBNotification *)noti {

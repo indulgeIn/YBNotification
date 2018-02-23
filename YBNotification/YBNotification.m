@@ -131,7 +131,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
 - (void)addObserverInfo:(YBObserverInfoModel *)observerInfo {
     
     //为observer关联一个释放监听器
-    id resultObserver = observerInfo.observer?observerInfo.observer:observerInfo.observer_strong;
+    id resultObserver = observerInfo.observer ?: observerInfo.observer_strong;
     if (!resultObserver) {
         return;
     }
