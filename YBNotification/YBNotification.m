@@ -226,13 +226,11 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
     }
 }
 - (void)array_removeObserverId:(NSString *)observerId object:(id)anObject array:(NSMutableArray *)array {
-    @autoreleasepool {
-        [array.copy enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj.observerId isEqualToString:observerId] && (!anObject || anObject == obj.object)) {
-                [array removeObject:obj];
-            }
-        }];
-    }
+    [array.copy enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.observerId isEqualToString:observerId] && (!anObject || anObject == obj.object)) {
+            [array removeObject:obj];
+        }
+    }];
 }
 
 #pragma mark 单例相关方法
