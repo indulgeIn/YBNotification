@@ -25,7 +25,7 @@
     _obj1 = [NSObject new];
     NSLog(@"_obj0:%@ _obj1:%@", _obj0, _obj1);
     
-//    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test0" object:nil];
+    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:@"test0" object:nil];
 //    [YBNotificationCenter.defaultCenter addObserver:self selector:@selector(respondsToNotice:) name:nil object:nil];
 
 }

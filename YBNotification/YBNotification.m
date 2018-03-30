@@ -230,6 +230,7 @@ static NSString *key_observersDic_noContent = @"key_observersDic_noContent";
         [array.copy enumerateObjectsUsingBlock:^(YBObserverInfoModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([obj.observerId isEqualToString:observerId] && (!anObject || anObject == obj.object)) {
                 [array removeObject:obj];
+                return;
             }
         }];
     }
